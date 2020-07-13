@@ -67,6 +67,20 @@ class ContactsTest extends TestCase
     
 }
 
+ /** @test */
+ public function canRetrieveAContact() {
+
+    $contact = factory(Contact::class)->create();
+    $response =$this->get('/api/contacts/'.$contact->id);
+    $response->assertJsonFragment([
+        'contact_name'=> $contact->contact_name,
+        'email'=> $contact->email,
+        'birthday'=> $contact->birthday,
+        'company'=> $contact->company,
+    ]);
+    
+}
+
     // /** @test */
     // public function NameIsRequired() {
 
