@@ -18,7 +18,7 @@ class CreateContactsTable extends Migration
             $table->string('contact_name', 150);
             $table->string('email', 150);
             $table->string('birthday', 150);
-            $table->string('company', 150);
+            $table->timestamp('company', 150);
             $table->timestamps();
         });
     }
