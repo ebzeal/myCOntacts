@@ -3,21 +3,43 @@
 namespace Tests\Feature;
 
 use App\Contact;
+use App\User;
 use Carbon\Carbon;
 use Tests\TestCase;
 use Illuminate\Foundation\Testing\RefreshDatabase;
-// use Illuminate\Foundation\Testing\WithFaker;
+use Illuminate\Foundation\Testing\WithFaker;
 
 class ContactsTest extends TestCase
 {
     use RefreshDatabase;  // this refreshes the DB to get a newly created Model
 
+    protected $user;
+
     /** @test */
-    public function canAddContact() {
-        // $this->withoutExceptionHandling(); // this allows Laravel to check if our uri exist
+    protected function setUp(): void {
+        parent::setUp();
+        $this->user = factory(User::class)->create();
+
+    }
+
+    /** @test */
+    public function rejectAuthenticatedUser() {
+        $data = $this->data();
+        $response = $this->post('/api/contacts', array_merge($this->data(), ['api_token'=>'']));
+
+        $response->assertRedirect('/login');
+        $this->assertCount(0, Contact::all());
+
+    }
+
+    /** @test */
+    public function authUserCanAddContact() {
+        $this->withoutExceptionHandling(); // this allows Laravel to check if our uri exist
+
+        $user = factory(User::class)->create();
 
         $data = $this->data();
-        $this->post('/api/contacts', $data);
+        $this->post('/api/contacts', $this->data());
 
         $contact = Contact::first();
 
@@ -70,7 +92,7 @@ class ContactsTest extends TestCase
  /** @test */
  public function canRetrieveAContact() { 
     $contact = factory(Contact::class)->create();
-    $response =$this->get('/api/contacts/'.$contact->id);
+    $response =$this->get('/api/contacts/'.$contact->id . '?api_token=' . $this->user->api_token);
     $response->assertJsonFragment([
         'contact_name'=> $contact->contact_name,
         'email'=> $contact->email,
@@ -103,7 +125,7 @@ class ContactsTest extends TestCase
  public function canDeleteAContact() {
 
     $contact = factory(Contact::class)->create();
-    $response =$this->delete('/api/contacts/'.$contact->id);
+    $response =$this->delete('/api/contacts/'.$contact->id, ['api_token' => $this->user->api_token]);
 
     $this->assertCount(0, Contact::all());
     
@@ -136,6 +158,7 @@ class ContactsTest extends TestCase
         return  ['contact_name' => 'Test Name',
         'email'=>'test@email.com',
         'birthday'=>'01/06/1990',
-        'company' => 'Welcome Inc.'];
+        'company' => 'Welcome Inc.',
+    'api_token'=> $this->user->api_token];
     }
 }
