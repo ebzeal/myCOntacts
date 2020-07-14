@@ -19,6 +19,10 @@ class ContactsController extends Controller
         $contact->update($this->validateInput());
     }
 
+    public function destroy(Contact $contact) {
+        $contact->delete();
+    }
+
     private function validateInput() {
         $data = request()->validate([
             'contact_name' => 'required',

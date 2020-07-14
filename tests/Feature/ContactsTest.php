@@ -98,6 +98,17 @@ class ContactsTest extends TestCase
     
 }
 
+
+ /** @test */
+ public function canDeleteAContact() {
+
+    $contact = factory(Contact::class)->create();
+    $response =$this->delete('/api/contacts/'.$contact->id);
+
+    $this->assertCount(0, Contact::all());
+    
+}
+
     // /** @test */
     // public function NameIsRequired() {
 
