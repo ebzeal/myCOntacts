@@ -23,7 +23,7 @@ class ContactsTest extends TestCase
 
         $this->assertEquals('Test Name', $contact->contact_name);
         $this->assertEquals('test@email.com', $contact->email);
-        $this->assertEquals('01/06/1990', $contact->birthday);
+        $this->assertEquals('01/06/1990', $contact->birthday->format('m/d/Y'));
         $this->assertEquals('Welcome Inc.', $contact->company);
     }
  /** @test */
@@ -68,8 +68,7 @@ class ContactsTest extends TestCase
 }
 
  /** @test */
- public function canRetrieveAContact() {
-
+ public function canRetrieveAContact() { 
     $contact = factory(Contact::class)->create();
     $response =$this->get('/api/contacts/'.$contact->id);
     $response->assertJsonFragment([
@@ -78,6 +77,24 @@ class ContactsTest extends TestCase
         'birthday'=> $contact->birthday,
         'company'=> $contact->company,
     ]);
+    
+}
+
+
+ /** @test */
+ public function canPatchAContact() {
+
+    $this->withoutExceptionHandling();
+
+    $contact = factory(Contact::class)->create();
+    $response =$this->patch('/api/contacts/'.$contact->id, $this->data());
+
+    $contact = $contact->fresh();
+
+    $this->assertEquals('Test Name', $contact->contact_name);
+        $this->assertEquals('test@email.com', $contact->email);
+        $this->assertEquals('01/06/1990', $contact->birthday->format('m/d/Y'));
+        $this->assertEquals('Welcome Inc.', $contact->company);
     
 }
 
