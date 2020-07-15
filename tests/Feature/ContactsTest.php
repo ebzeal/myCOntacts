@@ -48,6 +48,21 @@ class ContactsTest extends TestCase
         $this->assertEquals('01/06/1990', $contact->birthday->format('m/d/Y'));
         $this->assertEquals('Welcome Inc.', $contact->company);
     }
+
+ /** @test */
+public function authUsersCanFetchContacts() {
+    $this->withoutExceptionHandling();
+
+    $userOne = factory(User::class)->create();
+    $userTwo = factory(User::class)->create();
+
+    $contactOne = factory(Contact::class)->create(['user_id'=>$userOne->id]);
+    $contactTwo = factory(Contact::class)->create(['user_id'=>$userTwo->id]);
+
+    $response = $this->get('/api/contacts?api_token='.$userOne->api_token);
+    $response->assertJsonCount(1)->assertJson([['id' => $contactOne->id]]);
+}
+
  /** @test */
  public function requiredField() {
 
