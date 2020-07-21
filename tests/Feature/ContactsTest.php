@@ -162,7 +162,15 @@ public function authUsersCanRetrieveTheirCOntacts()
         $this->assertEquals('test@email.com', $contact->email);
         $this->assertEquals('01/06/1990', $contact->birthday->format('m/d/Y'));
         $this->assertEquals('Welcome Inc.', $contact->company);
-    
+        $response->assertStatus(Response::HTTP_OK);
+        $response->assertJson([
+            'data' => [
+                'contact_id' => $contact->id,
+            ],
+            'links' => [
+                'self' => $contact->path(),
+            ]
+        ]);
 }
 
 /** @test */
@@ -187,7 +195,7 @@ public function authUserCanEditTheirContact(){
     $response =$this->delete('/api/contacts/'.$contact->id, ['api_token' => $this->user->api_token]);
 
     $this->assertCount(0, Contact::all());
-    
+    $response->assertStatus(Response::HTTP_NO_CONTENT);
 }
 
  /** @test */
