@@ -59,7 +59,16 @@ public function authUsersCanFetchContacts() {
     $contactTwo = factory(Contact::class)->create(['user_id'=>$userTwo->id]);
 
     $response = $this->get('/api/contacts?api_token='.$userOne->api_token);
-    $response->assertJsonCount(1)->assertJson([['id' => $contactOne->id]]);
+    $response->assertJsonCount(1)
+            ->assertJson([
+                'data' => [
+                    [
+                        "data" => [
+                            'contact_id' => $contactOne->id
+                        ]
+                    ]
+                ]
+            ]);
 }
 
  /** @test */
@@ -107,11 +116,14 @@ public function authUsersCanFetchContacts() {
  public function canRetrieveAContact() { 
     $contact = factory(Contact::class)->create(['user_id'=>$this->user->id]);
     $response =$this->get('/api/contacts/'.$contact->id . '?api_token=' . $this->user->api_token);
+    // dd(json_decode($response->getContent())); 
     $response->assertJsonFragment([
+        'contact_id' => $contact->id,
         'contact_name'=> $contact->contact_name,
         'email'=> $contact->email,
-        'birthday'=> $contact->birthday,
+        'birthday'=> $contact->birthday->format('m/d/Y'),
         'company'=> $contact->company,
+        'last_updated' => $contact->updated_at->diffForHumans(),
     ]);
     
 }
