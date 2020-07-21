@@ -5,6 +5,8 @@ namespace Tests\Feature;
 use App\Contact;
 use App\User;
 use Carbon\Carbon;
+use Symfony\Component\HttpFoundation\Response;
+// use Illuminate\Support\Facades\Response;
 use Tests\TestCase;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Foundation\Testing\WithFaker;
@@ -38,7 +40,7 @@ class ContactsTest extends TestCase
         $user = factory(User::class)->create();
 
         $data = $this->data();
-        $this->post('/api/contacts', $this->data());
+        $response = $this->post('/api/contacts', $this->data());
 
         $contact = Contact::first();
 
@@ -46,6 +48,15 @@ class ContactsTest extends TestCase
         $this->assertEquals('test@email.com', $contact->email);
         $this->assertEquals('01/06/1990', $contact->birthday->format('m/d/Y'));
         $this->assertEquals('Welcome Inc.', $contact->company);
+        $response->assertStatus(Response::HTTP_CREATED); 
+        $response->assertJson([
+            'data' => [
+                'contact_id' => $contact->id,
+            ],
+            'links' => [
+                'self' => $contact->path(),
+            ]
+        ]); 
     }
 
  /** @test */

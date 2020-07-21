@@ -1,7 +1,6 @@
 <?php
 
 namespace App;
-// use User;
 
 use Carbon\Carbon;
 // use Laravel\Scout\Searchable;
