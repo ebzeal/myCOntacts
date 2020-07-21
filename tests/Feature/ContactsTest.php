@@ -15,7 +15,6 @@ class ContactsTest extends TestCase
 
     protected $user;
 
-    /** @test */
     protected function setUp(): void {
         parent::setUp();
         $this->user = factory(User::class)->create();
